@@ -1,0 +1,35 @@
+# dvc.yaml
+stages:
+  get_data:
+    cmd: python scripts/dataproj.py
+    deps:
+      - scripts/dataproj.py
+    params:
+      - index_col
+    outs:
+      - data/initial_dataproj.csv
+  fit_model:
+    cmd: python scripts/fitproj.py
+    deps:
+      - data/initial_dataproj.csv
+      - scripts/fitproj.py
+    params:
+      - target_col
+      - remainder
+      - n_estimators
+      - max_depth
+      - random_state
+      - n_jobs
+    outs:
+      - models/fitted_flats_model.pkl
+  evaluate_model:
+    cmd: python scripts/evaluateproj.py
+    deps:
+      - models/fitted_flats_model.pkl
+      - scripts/evaluateproj.py
+    params:
+      - target_col
+      - n_jobs
+      - scoring
+    outs:
+      - cv_results/cv_res_flats.json

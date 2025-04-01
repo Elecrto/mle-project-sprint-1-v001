@@ -1,0 +1,76 @@
+schema: '2.0'
+stages:
+  get_data:
+    cmd: python scripts/dataproj.py
+    deps:
+    - path: scripts/dataproj.py
+      hash: md5
+      md5: 098f165adb8f9e6ef34b30629fe0a950
+      size: 1503
+    params:
+      params.yaml:
+        index_col: id
+    outs:
+    - path: data/initial_dataproj.csv
+      hash: md5
+      md5: d6cbf9dcf451af772381a41d38afa9c0
+      size: 8660264
+      cloud:
+        flats_model:
+          etag: d6cbf9dcf451af772381a41d38afa9c0
+          version_id: 0006316615835EC3
+  fit_model:
+    cmd: python scripts/fitproj.py
+    deps:
+    - path: data/initial_dataproj.csv
+      hash: md5
+      md5: d6cbf9dcf451af772381a41d38afa9c0
+      size: 8660264
+    - path: scripts/fitproj.py
+      hash: md5
+      md5: 4e764f9240b25775e4370df10313a9c2
+      size: 1274
+    params:
+      params.yaml:
+        max_depth: 10
+        n_estimators: 300
+        n_jobs: -1
+        random_state: 42
+        remainder: passthrough
+        target_col: price
+    outs:
+    - path: models/fitted_flats_model.pkl
+      hash: md5
+      md5: c52068d0e6bb6c4dd8bc31cbbe139c57
+      size: 37996727
+      cloud:
+        flats_model:
+          etag: c52068d0e6bb6c4dd8bc31cbbe139c57
+          version_id: 00063166157F119E
+  evaluate_model:
+    cmd: python scripts/evaluateproj.py
+    deps:
+    - path: models/fitted_flats_model.pkl
+      hash: md5
+      md5: c52068d0e6bb6c4dd8bc31cbbe139c57
+      size: 37996727
+    - path: scripts/evaluateproj.py
+      hash: md5
+      md5: 868b780b59bcc41614f1e69498e3c29e
+      size: 998
+    params:
+      params.yaml:
+        n_jobs: -1
+        scoring:
+        - neg_mean_absolute_error
+        - r2
+        target_col: price
+    outs:
+    - path: cv_results/cv_res_flats.json
+      hash: md5
+      md5: 3e8fca5822978a8cd18aff7b5f28822f
+      size: 69
+      cloud:
+        flats_model:
+          etag: 3e8fca5822978a8cd18aff7b5f28822f
+          version_id: 000631B11B4ACA07
